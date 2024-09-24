@@ -7,7 +7,6 @@ from openai import OpenAI
 if not os.getenv("OPENAI_API_KEY"):
     raise Exception("Please set OPENAI_API_KEY environment variable.")
 
-
 class QA(rx.Base):
     """A question and answer pair."""
 
@@ -16,7 +15,7 @@ class QA(rx.Base):
 
 
 DEFAULT_CHATS = {
-    "Intros": [],
+    "Lets talk": [],
 }
 
 
@@ -27,7 +26,7 @@ class State(rx.State):
     chats: dict[str, list[QA]] = DEFAULT_CHATS
 
     # The current chat name.
-    current_chat = "Intros"
+    current_chat = "Lets talk"
 
     # The current question.
     question: str
@@ -111,9 +110,12 @@ class State(rx.State):
         messages = messages[:-1]
 
         # Start a new session to answer the question.
-        session = OpenAI().chat.completions.create(
-            model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
+        client = OpenAI()
+        print(f"base_url: {client.base_url}")
+        session = client.chat.completions.create(
+            model=os.getenv("OPENAI_MODEL", "meta-llama/Meta-Llama-3.1-8B-Instruct"),
             messages=messages,
+            max_tokens=1024,
             stream=True,
         )
 
@@ -122,7 +124,7 @@ class State(rx.State):
             if hasattr(item.choices[0].delta, "content"):
                 answer_text = item.choices[0].delta.content
                 # Ensure answer_text is not None before concatenation
-                if answer_text is not None:
+                if answer_text is not None and answer_text != "[DONE]" and not "assistant" in answer_text:
                     self.chats[self.current_chat][-1].answer += answer_text
                 else:
                     # Handle the case where answer_text is None, perhaps log it or assign a default value

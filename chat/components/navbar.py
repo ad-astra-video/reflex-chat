@@ -76,13 +76,81 @@ def modal(trigger) -> rx.Component:
         ),
     )
 
+def settings(trigger) -> rx.Component:
+    """a model to update settings"""
+    return rx.dialog.root(
+        rx.dialog.trigger(trigger),
+        rx.dialog.content(
+            rx.dialog.title("Settings"),
+            rx.dialog.description(
+                "Settings for chat",
+                size="2",
+                margin_bottom="16px",
+            ),
+            rx.flex(
+                rx.text(
+                    "Livepeer Gateway API URL",
+                    as_="div",
+                    size="2",
+                    margin_bottom="4px",
+                    weight="bold",
+                ),
+                rx.input(
+                    default_value="local",
+                    placeholder="enter Livepeer gateway api url",
+                ),
+                rx.text(
+                    "OpenAI API URL",
+                    as_="div",
+                    size="2",
+                    margin_bottom="4px",
+                    weight="bold",
+                ),
+                rx.input(
+                    default_value="local",
+                    placeholder="enter openai api url",
+                ),
+                rx.text(
+                    "System Message",
+                    as_="div",
+                    size="2",
+                    margin_bottom="4px",
+                    weight="bold",
+                ),
+                rx.text_area(
+                    default_value="You are a friendly assistant.",
+                    placeholder="enter system message to guide the LLM",
+                ),
+                direction="column",
+                spacing="3",
+            ),
+            rx.flex(
+                rx.dialog.close(
+                    rx.button(
+                        "Cancel",
+                        color_scheme="gray",
+                        variant="soft",
+                    ),
+                ),
+                rx.dialog.close(
+                    rx.button(
+                        "Save",
+                        on_click=State.update_settings
+                    ),
+                ),
+                spacing="3",
+                margin_top="16px",
+                justify="end",
+           ),
+        ),
+    )
 
 def navbar():
     return rx.box(
         rx.hstack(
             rx.hstack(
-                rx.avatar(fallback="RC", variant="solid"),
-                rx.heading("Reflex Chat"),
+                rx.avatar(fallback="DPN", variant="solid"),
+                rx.heading("Chat"),
                 rx.desktop_only(
                     rx.badge(
                     State.current_chat,
@@ -103,7 +171,7 @@ def navbar():
                         background_color=rx.color("mauve", 6),
                     )
                 ),
-                rx.desktop_only(
+                settings(
                     rx.button(
                         rx.icon(
                             tag="sliders-horizontal",
